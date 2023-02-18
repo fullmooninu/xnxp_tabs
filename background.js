@@ -1,56 +1,56 @@
-// Initialize tabsInfo object
-var tabsInfo = {};
+// Initialize tabInfoList object
+let tabInfoList = {};
 
-// Load tab info from storage
-chrome.storage.local.get("tabsInfo", function(result) {
-  tabsInfo = result.tabsInfo || {};
+// Load tabInfoList from storage
+chrome.storage.local.get("tabInfoList", function(result) {
+  tabInfoList = result.tabInfoList || {};
 });
 
-// Check if all tabs in tabsInfo exist in the session
+// Check if all tabs in tabInfoList exist in the session. Delete the ones not in the session.
 chrome.tabs.query({}, function(tabs) {
-  var activeTabIds = tabs.map(function(tab) { return tab.id; });
-  var tabsInfoUpdated = false;
-  for (var tabId in tabsInfo) {
-    if (activeTabIds.indexOf(parseInt(tabId)) === -1) {
-      delete tabsInfo[tabId];
-      tabsInfoUpdated = true;
+  let activeTabIds = tabs.map(function(tab) { return tab.id; });
+  let tabInfoListUpdated = false;
+  for (let tabInfo in tabInfoList) {
+    if (activeTabIds.indexOf(parseInt(tabInfo.id)) === -1) {
+      delete tabInfoList[tanInfo];
+      tabInfoListUpdated = true;
     }
   }
-  if (tabsInfoUpdated) {
-    chrome.storage.local.set({ tabsInfo: tabsInfo });
+  if (tabInfoListUpdated) {
+    chrome.storage.local.set({ tabInfoListUpdated: tabInfoListUpdated });
   }
 });
 
-// Load already opened tabs
+// Load already opened tabs.
 chrome.tabs.query({}, function(tabs) {
-  var tabsInfoUpdated = false;
+  var tabInfoListUpdated = false;
   tabs.forEach(function(tab) {
-    if (!(tab.id in tabsInfo)) {
+    if (!(tab.id in tabInfoList)) {
       var tabInfo = {
           id: tab.id,
           title: tab.title,
           firstOpened: new Date().toLocaleString(),
           lastOpened: new Date().toLocaleString()
       };
-      tabsInfo[tab.id] = tabInfo;
-      tabsInfoUpdated = true;
+      tabInfoList[tab.id] = tabInfo;
+      tabInfoListUpdated = true;
     }
   });
-  if (tabsInfoUpdated) {
-    chrome.storage.local.set({ tabsInfo: tabsInfo });
+  if (tabInfoListUpdated) {
+    chrome.storage.local.set({ tabInfoListUpdated: tabInfoListUpdated });
   }
 });
 
 // Update tabsInfo when a tab is updated or activated
 function updateTabInfo(tabId, changeInfo, tab) {
   if (changeInfo.status === "complete" || changeInfo.active === true) {
-    if (!(tabId in tabsInfo)) {
-      tabsInfo[tabId] = { id:tab.id, title: tab.title, firstOpened: new Date().toLocaleString(), lastOpened: new Date().toLocaleString() };
+    if (!(tabId in tabInfoList)) {
+      tabInfoList[tabId] = { id:tab.id, title: tab.title, firstOpened: new Date().toLocaleString(), lastOpened: new Date().toLocaleString() };
     } else {
-      tabsInfo[tabId].title = tab.title;
-      tabsInfo[tabId].lastOpened = new Date().toLocaleString();
+      tabInfoList[tabId].title = tab.title;
+      tabInfoList[tabId].lastOpened = new Date().toLocaleString();
     }
-    chrome.storage.local.set({ tabsInfo: tabsInfo });
+    chrome.storage.local.set({ tabInfoList: tabInfoList });
   }
 }
 chrome.tabs.onUpdated.addListener(updateTabInfo);
@@ -62,13 +62,13 @@ chrome.tabs.onActivated.addListener(function(activeInfo) {
 
 // Remove tab from tabsInfo when it is closed
 chrome.tabs.onRemoved.addListener(function(tabId, removeInfo) {
-  delete tabsInfo[tabId];
-  chrome.storage.local.set({ tabsInfo: tabsInfo });
+  delete tabInfoList[tabId];
+  chrome.storage.local.set({ tabInfoList: tabInfoList });
 });
 
 // Message listener to retrieve tabsInfo from popup
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
   if (request === "getTabInfo") {
-    sendResponse(tabsInfo);
+    sendResponse(tabInfoList);
   }
 });
