@@ -1,0 +1,26 @@
+body {
+  background-color: #0077be;
+  color: white;
+  font-family: Arial, sans-serif;
+  font-size: 14px;
+  padding: 10px;
+  width: 100rem;
+}
+
+#tabInfo {
+  margin-top: 10px;
+}
+
+.tabInfoRow {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 5px;
+}
+
+.tabId {
+  font-weight: bold;
+}
+
+.tabTime {
+  font-style: italic;
+}
