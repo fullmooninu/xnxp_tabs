@@ -1,11 +1,3 @@
-function switchToTab(tabId) {
-  chrome.tabs.get(tabId, function(my_tab) {
-    chrome.windows.update(my_tab.windowId, { focused: true }, function() {
-      chrome.tabs.update(my_tab.id, { active: true });
-    });
-  });
-}
-
 // Send message to background script to retrieve tab info
 let maxTitleLength = 50;
 
@@ -34,7 +26,7 @@ chrome.runtime.sendMessage("getTabInfo", function(tabsInfo) {
     var switchButton = document.createElement("button");
     switchButton.textContent = "Switch";
     switchButton.addEventListener("click", function() {
-      switchToTab(tab.id);
+      chrome.tabs.update(tab.id, { active: true });
     });
 
     // Create the button cell element
