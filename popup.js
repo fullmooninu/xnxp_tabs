@@ -26,7 +26,16 @@ chrome.runtime.sendMessage("getTabInfo", function(tabsInfo) {
     var switchButton = document.createElement("button");
     switchButton.textContent = "Switch";
     switchButton.addEventListener("click", function() {
-      chrome.tabs.update(tab.id, { active: true });
+      chrome.tabs.query({ active: false, currentWindow: false }, function(tabs) {
+        for (var i = 0; i < tabs.length; i++) {
+          if (tabs[i].id == tab.id) {
+            chrome.windows.update(tabs[i].windowId, { focused: true }, function() {
+              chrome.tabs.update(tabs[i].id, { active: true });
+            });
+            break;
+          }
+        }
+      });
     });
 
     // Create the button cell element
